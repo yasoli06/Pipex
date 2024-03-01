@@ -6,13 +6,13 @@
 /*   By: yaolivei <yaolivei@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/26 18:03:20 by yaolivei          #+#    #+#             */
-/*   Updated: 2024/03/01 18:30:46 by yaolivei         ###   ########.fr       */
+/*   Updated: 2024/03/01 19:49:49 by yaolivei         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "pipex.h"
 
-char **final_cmd(char *cmd, t_pipe *pipex) - chequear esta fucion
+char **final_cmd(char *cmd, t_pipe *pipex) - corregir esta funcion 
 {
 	int	i;
 	char **cmd_final;
@@ -41,7 +41,27 @@ char **final_cmd(char *cmd, t_pipe *pipex) - chequear esta fucion
 
 char **check_cmd_access(char *cmd, t_pipe *pipex)
 {
-	
+	char	*final_path;
+	int	i;
+
+	i = 0;
+	while (pipex->all_path[i])
+	{
+		final_path = ft_strjoin(pipex->all_path[i], "/");
+		final_path = ft_strjoin(final_path, cmd[0]);
+		if (!final_path)
+		error_message("Error all paths\n", 0, pipex);
+		if (access(final_path, F_OK) == 0)
+		{
+			if (access(final_path, X_OK) != 0)
+				error_message("Acess fail\n", 0, pipex);
+			else
+				return(final_path);
+		}
+		i++;
+	}
+	error_message("Error 3\n", 0, pipex);
+	return (0);
 }
 
 void init_pipex(char **av, t_pipe *pipex)
@@ -79,7 +99,7 @@ int	parsing(char **av, char *envp[], t_pipe *pipex, int i)
 	return (0);
 }
 
-int	main(int ac, char *av, char *envp[])
+int	main(int ac, char **av, char *envp[])
 {
 	t_pipe *pipex;
 	pid_t	pid;

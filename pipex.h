@@ -6,7 +6,7 @@
 /*   By: yaolivei <yaolivei@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/26 17:47:27 by yaolivei          #+#    #+#             */
-/*   Updated: 2024/03/01 18:20:15 by yaolivei         ###   ########.fr       */
+/*   Updated: 2024/03/01 19:49:05 by yaolivei         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -41,10 +41,10 @@ typedef struct s_pipe
 
 // MAIN // 
 char	**final_cmd(char *cmd, t_pipe *pipex);
-char	**check_cmd_access(char **cmd, t_pipe *pipex);
+char	**check_cmd_access(char *cmd, t_pipe *pipex);
 void	init_pipex(char **av, t_pipe *pipex);
 int	parsing(char **av, char *envp[], t_pipe *pipex);
-int	main(int ac, char *av, char *envp[]);
+int	main(int ac, char **av, char *envp[]);
 
 // ERROR //
 void	clean_up(t_pipe *pipex);
