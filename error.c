@@ -6,52 +6,56 @@
 /*   By: yaolivei <yaolivei@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/29 17:56:52 by yaolivei          #+#    #+#             */
-/*   Updated: 2024/03/04 16:48:38 by yaolivei         ###   ########.fr       */
+/*   Updated: 2024/03/05 19:52:10 by yaolivei         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "pipex.h"
 
-void    free_all(char **freedom)
+void	so_wrong(int error, t_pipex *pipex, int flag)
 {
-    int i = 0;
-
-    while(freedom[i])
-    {
-        free(freedom[i])
-        i++;
-    }
-    free(freedom);
-    freedom = NULL;
-}
-void	clean_up(t_pipe *pipex)
-{
-    if(pipex && pipex->all_path)
-        free_all(pipex->all_path);
-    if(pipex && pipex->path1)
-        free(pipex->path1);
-    if(pipex && pipex->path2)
-        free(pipex->path2);
-    if(pipex && pipex->cmd1)
-        free_all(pipex->cmd1);
-    if(pipex && pipex->cmd2)
-        free_all(pipex->cmd2);
-    if(pipex)
-        free(pipex);
-    pipex = NULL; 
+	if (flag != 1)
+	{
+		close(STDIN_FILENO);
+		close(STDIN_FILENO);
+		close(pipex->in_fd);
+		close(pipex->out_fd);
+		free_all(pipex);
+	}
+	exit(error);
 }
 
-void	error_message(char *message, int flag, t_pipe *pipe)
+void	free_all(t_pipex *pipex)
 {
-    if (pipex)
-        clean_up(pipex);
-    write(2, "pipex: ", 7);
-    if (flag == 0)
-        perror(message);
-    else
-    {
-        write(2, message, ft_strlen(message));
-        exit(flag);
-    }
-    exit(errno);
+	int	i;
+
+	i = -1;
+	if (pipex->all_path != NULL)
+	{
+		while (pipex->all_path[++i])
+		{
+			free(pipex->all_path[i]);
+			pipex->all_path[i] = NULL;
+		}
+		free(pipex->all_path);
+		pipex->all_path = NULL;
+	}
+	i = -1;
+	if (pipex->cmd != NULL)
+	{
+		while (pipex->cmd[++i])
+		{
+			free(pipex->cmd[i]);
+			pipex->cmd[i] = NULL;
+		}
+		free(pipex->cmd);
+		pipex->cmd = NULL;
+	}
+}
+
+int	error_message(char *s1, int error)
+{
+	ft_putstr_fd("Pipex: ", 2);
+	ft_putstr_fd(s1, 2);
+	return (error);
 }

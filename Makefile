@@ -8,12 +8,13 @@ NAME = pipex
 
 LIBFT = ./libft/libft.a
 
-SRCS = main.c error.c
+SRCS = main.c error.c processes.c
 
 OBJECTS = $(SRCS:%.c=%.o)
 
 CC = gcc
 CFLAGS = -Wall -Wextra -Werror
+#BIN	= ./bin/
 LIBFT_FLAGS = -L ./libft -lft
 RM = rm -rf
 
@@ -21,20 +22,23 @@ RM = rm -rf
 	$(CC) -c $< $(CFLAGS) -o $@
 	@echo "$(YELLOW)Compiling... $(END)$(patsubst $(DIR_BUILD)%,%,$@)"
 
-all: $(LIBFT) $(NAME)
+all: $(LIBFT) $(BIN) $(NAME)
 
 $(LIBFT):
 	@$(MAKE) -C ./libft
 
+# $(BIN):
+# 	@mkdir -p $(BIN)
+
 $(NAME) : $(OBJECTS)
-	@$(CC) (CFLAGS) $(OBJECTS)$(LIBFT) -o $(NAME)
+	@$(CC) $(CFLAGS) $(OBJECTS) $(LIBFT) -o $(NAME)
 	@echo "$(GREEN)PIPEX DONE$(END)"
 
 clean:
 	@$(MAKE) clean -C ./libft
 	@$(RM) $(OBJECTS)
 	@$(RM) $(NAME)
-
+	
 fclean: clean
 	@$(MAKE) fclean -C ./libft
 	@$(RM) $(NAME)
