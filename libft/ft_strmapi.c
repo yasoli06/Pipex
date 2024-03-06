@@ -6,7 +6,7 @@
 /*   By: yaolivei <yaolivei@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/10/06 03:32:17 by yaolivei          #+#    #+#             */
-/*   Updated: 2023/10/06 15:56:46 by yaolivei         ###   ########.fr       */
+/*   Updated: 2024/03/06 13:16:15 by yaolivei         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,8 +19,8 @@ char	*ft_strmapi(char const *s, char (*f)(unsigned int, char))
 	int		i;
 
 	if (!s || !f)
-	len_s = ft_strlen(s);
-		return (NULL);
+		len_s = ft_strlen(s);
+	return (NULL);
 	ptr = (char *)malloc(len_s + 1);
 	if (!ptr)
 		return (NULL);

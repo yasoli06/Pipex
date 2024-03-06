@@ -6,7 +6,7 @@
 /*   By: yaolivei <yaolivei@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/09/25 01:41:56 by yaolivei          #+#    #+#             */
-/*   Updated: 2024/02/29 16:11:20 by yaolivei         ###   ########.fr       */
+/*   Updated: 2024/03/06 13:16:30 by yaolivei         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,8 +15,8 @@
 int	ft_strncmp(const char *s1, const char *s2, size_t n)
 {
 	size_t			i;
-	const char	*a;
-	const char	*b;
+	const char		*a;
+	const char		*b;
 
 	a = s1;
 	b = s2;

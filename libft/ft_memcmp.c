@@ -6,7 +6,7 @@
 /*   By: yaolivei <yaolivei@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/09/25 02:09:21 by yaolivei          #+#    #+#             */
-/*   Updated: 2024/02/29 16:11:58 by yaolivei         ###   ########.fr       */
+/*   Updated: 2024/03/06 13:15:49 by yaolivei         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,8 +15,8 @@
 int	ft_memcmp(const void *s1, const void *s2, size_t n)
 {
 	size_t			i;
-	const char	*a;
-	const char	*b;
+	const char		*a;
+	const char		*b;
 
 	i = 0;
 	a = s1;

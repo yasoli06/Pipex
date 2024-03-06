@@ -6,122 +6,50 @@
 /*   By: yaolivei <yaolivei@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/04 13:35:27 by yaolivei          #+#    #+#             */
-/*   Updated: 2024/03/05 20:01:18 by yaolivei         ###   ########.fr       */
+/*   Updated: 2024/03/06 17:18:33 by yaolivei         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "pipex.h"
 
-void	get_cmd(t_pipex *pipex)
+void	parent_process(t_pipex *pipex);
 {
-	int		i;
-	char	*temp;
-
-	pipex->cmd = ft_split(pipex->av[pipex->nb_cmd_curr], ' ');
-	if (!pipex->cmd)
-		error_message("Error split cmd\n", 6);
-	i = -1;
-	temp = NULL;
-	while (pipex->cmd[++i])
+	close(pipex->fd[1]);
+	pipex->out_fd = open (pipex->av, O_TRUNC | O_CREAT | O_RDWR, 0666);
+	if (pipex->out_fd == -1)
+		error_message(strerror(1), 12);
+	if (dup2(fd[0], STDIN_FILENO) < 0)
 	{
-		temp = pipex->cmd[i];
-		pipex->cmd[i] = ft_strtrim(pipex->cmd[i], "'");
-		free(temp);
+		close(pipex->in_fd);
+		error_message("dup2 fd[0]\n", 12);
 	}
-}
-
-void	check_cmd_access(t_pipex *pipex)
-{
-	int		i;
-	char	*cmd;
-
-	get_cmd(pipex);
-	i = 0;
-	while (pipex->all_path[i])
+	if (dup2(pipex->out_fd, STDOUT_FILENO) < 0)
 	{
-		cmd = ft_strjoin(pipex->all_path[i], (const char *)pipex->cmd[0]);
-		if (access(cmd, F_OK) == 0
-			&& execve(cmd, pipex->cmd, pipex->envp) == -1)
-		{
-			free(cmd);
-			error_message("Error executing cmd\n", 7);
-		}
-		free(cmd);
-		i++;
+		close(pipex->out_fd);
+		error_message("dup2 fd\n", 12);
 	}
-	error_message("Error to find path\n", 8);
-}
-
-void	open_file(char **av, t_pipex *pipex)
-{
-	pipex->in_fd = open(av[1], O_RDONLY);
-	pipex->out_fd = open(av[4], O_WRONLY | O_CREAT | O_TRUNC, 0666);
-	if (pipex->in_fd < 0)
+	close(pipex->out_fd);
+	if (execve(pipex->path2, pipex->cmd2, envp) == -1)
 	{
-		if (pipex->out_fd >= 0)
-			close(pipex->out_fd);
-		close(pipex->fd[0]);
-		close(pipex->fd[1]);
-		error_message("Error while open file\n", 9);
+		error_message("Error en execve\n", 12);
 	}
-	if (pipex->out_fd < 0)
-	{
-		close(pipex->fd[0]);
-		close(pipex->fd[1]);
-		error_message("Error while open file\n", 10);
-	}
-}
-
-void	get_path(t_pipex *pipex)
-{
-	int	i;
-
-	i = 0;
-	while (!ft_strnstr(pipex->envp[i], "PATH=", 5))
-		i++;
-	pipex->path_temp = ft_split(pipex->envp[i] + 5, ':');
-	if (pipex->path_temp == NULL)
-		error_message("Error spliting path\n", 11);
-	i = 0;
-	while (pipex->path_temp[i])
-		i++;
-	pipex->all_path = malloc(sizeof(char *) * (i + 1));
-	i = -1;
-	while (pipex->path_temp[++i])
-		pipex->all_path[i] = ft_strjoin(pipex->path_temp[i], "/");
-	pipex->all_path[i] = NULL;
-	i = 0;
-	while (pipex->path_temp[i])
-	{
-		free(pipex->path_temp[i]);
-		i++;
-	}
-	free(pipex->path_temp);
+	close(fd[0]);
 }
 
 void	child_process(t_pipex *pipex)
 {
-	pipex->pid = fork();
-	if (pipex->pid == -1)
-		error_message("Error creating fork\n", 12);
-	if (pipex->pid == 0)
+	close(fd[0]);
+	pipex->in_fd = open (pipex->av, O_RDONLY);
+	if (pipex->in_fd == -1)
+		error_message("No lee el infile\n", 13);
+	if (dup2(pipex->in_fd, STDIN_FILENO) < 0)
 	{
-		dup2(pipex->fd[1], STDOUT_FILENO);
-		close(pipex->fd[0]);
-		close(pipex->fd[1]);
-		dup2(pipex->in_fd, STDIN_FILENO);
-		check_cmd_access(pipex);
+		close(pipex->in_fd);
+		error_message("dup2 fd\n", 13);
 	}
-	pipex->pid_2 = fork ();
-	if (pipex->pid_2 == -1)
-		error_message("Error creating fork\n", 12);
-	if (pipex->pid_2 == 0)
-	{
-		pipex->nb_cmd_curr++;
-		dup2(pipex->fd[0], STDIN_FILENO);
-		close(pipex->fd[0]);
-		close(pipex->fd[1]);
-		dup2(pipex->out_fd, STDOUT_FILENO);
-		check_cmd_access(pipex);
-	}
+	close(pipex->in_fd);
+	if (dup2(fd[1], STDOUT_FILENO) < 0)
+		error_message("dup out a f[1] fd\n", 13);
+	if (execve(pipex->path1, pipex->cmd1, envp) == -1)
+		error_message("Error en execve\n", 13);
 }

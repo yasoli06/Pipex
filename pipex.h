@@ -6,7 +6,7 @@
 /*   By: yaolivei <yaolivei@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/26 17:47:27 by yaolivei          #+#    #+#             */
-/*   Updated: 2024/03/05 19:53:58 by yaolivei         ###   ########.fr       */
+/*   Updated: 2024/03/06 17:22:42 by yaolivei         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -31,8 +31,7 @@
 //libft
 # include "libft/libft.h"
 
-# define DEF_PATH "/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin:
-					/usr/local/go/bin:"
+# define DEF_PATH "/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin:/usr/local/go/bin:"
 # define ACCESS_OK 0
 # define ACCESS_KO 1
 
@@ -42,28 +41,32 @@ struct	s_pipex
 	int		in_fd;
 	int		out_fd;
 	int		ac;
-	int		*fd;
-	char	**av;
+	char	*av;
+	int		fd;
 	char	**all_path;
-	char	**path_temp;
+	char	**path1;
+	char	**path2;
 	char	**envp;
-	char	**cmd;
+	char	*cmd1;
+	char	*cmd2;
 	pid_t	pid;
-	pid_t	pid_2;
-	int		nb_cmd_curr;
 };
 
 // MAIN // 
+void	init_all_paths(t_pipex *pipex, char *envp[]);
+int		get_data(char *argv[], char *envp[], t_pipex *pipex);
 void	init_pipex(t_pipex *pipex);
-void	get_data(int argc, char *argv[], char *envp[], t_pipex *pipex);
-int		main(int ac, char *av[], char *envp[]);
+int		main(int argc, char *argv[], char *envp[]);
 
 // PROCESSES //
-void	get_cmd(t_pipex *pipex);
-void	check_cmd_access(t_pipex *pipex);
-void	open_file(char **av, t_pipex *pipex);
-void	get_path(t_pipex *pipex);
+void	parent_process(t_pipex *pipex);
 void	child_process(t_pipex *pipex);
+
+// UTILS //
+int		substr_awk(char const *s, char c);
+char	**split_awk(char const *s, char c);
+char	**get_cmd(t_pipex *pipex);
+void	check_cmd_access(t_pipex *pipex);
 
 // ERROR //
 void	so_wrong(int error, t_pipex *pipex, int flag);
