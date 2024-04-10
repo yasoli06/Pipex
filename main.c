@@ -6,85 +6,43 @@
 /*   By: yaolivei <yaolivei@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/04/08 11:45:02 by yaolivei          #+#    #+#             */
-/*   Updated: 2024/04/09 18:46:57 by yaolivei         ###   ########.fr       */
+/*   Updated: 2024/04/10 19:18:55 by yaolivei         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "pipex.h"
 
-char	*check_access_cmd(t_pipex *pipex, char **cmd)
-{
-	char	*final_path;
-	int		i;
-
-	i = 0;
-	while (pipex->all_path[i])
-	{
-		final_path = px_barjoin(pipex->all_path[i], "/");
-		final_path = px_strjoin(final_path, cmd[0]);
-		if (!final_path)
-			error_message("error to join\n", pipex, 0);
-		if (access(final_path, F_OK) == 0)
-		{
-			if (access(final_path, X_OK) != 0)
-				error_message("access fail\n", pipex, 1);
-			else
-				return (final_path);
-		}
-		else
-			free(final_path);
-		i++;
-	}
-	error_message("Error Access\n", pipex, 1);
-	return (0);
-}
-
-char	**final_cmd(char *cmd, t_pipex *pipex)
-{
-	int		i;
-	char	**final_cmd;
-
-	i = 0;
-	if (strchr_count(cmd, '\'') > 0)
-	{
-		final_cmd = ft_split_quote(cmd, pipex);
-		return (final_cmd);
-	}
-	else if (cmd[0] == '/')
-	{
-		i = ft_strlen(cmd) - 1;
-		while (cmd[i] != '/')
-			i--;
-		cmd = ft_substr(cmd, i + 1, ft_strlen(cmd));
-	}
-	final_cmd = ft_split(cmd, ' ');
-	return (final_cmd);
-}
-
-void	parsing(char **av, char *envp[], t_pipex *pipex)
+void	init_all_paths(t_pipex *pipex, char *envp[])
 {
 	int	i;
 
 	i = 0;
-	pipex->cmd1 = final_cmd(av[2], pipex);
-	pipex->cmd2 = final_cmd(av[3], pipex);
-	pipex->path1 = check_access_cmd(pipex, pipex->cmd1);
-	pipex->path2 = check_access_cmd(pipex, pipex->cmd2);
 	while (envp[i])
 	{
 		if (ft_strncmp(envp[i], "PATH=", 5) == 0)
 		{
-			pipex->all_path = ft_split_pipex(pipex, envp[i] + 5, ':');
-			break ;
+			pipex->all_path = ft_split(envp[i], ':');
+			pipex->all_path[0] = px_strtrim(pipex->all_path[0], "PATH=");
+			return ;
 		}
+		i++;
 	}
 	if (!pipex->all_path)
-		pipex->all_path = ft_split_pipex(pipex, DEF_PATH, ':');
+		pipex->all_path = ft_split (DEF_PATH, ':');
+}
+
+int	parsing(char **av, char *envp[], t_pipex *pipex)
+{
+	init_all_paths(pipex, envp);
+	pipex->cmd1 = final_cmd(av[2], pipex);
+	pipex->cmd2 = final_cmd(av[3], pipex);
+	pipex->path1 = check_access_cmd(pipex, pipex->cmd1);
+	pipex->path2 = check_access_cmd(pipex, pipex->cmd2);
+	return (0);
 }
 
 void	init_pipex(t_pipex *pipex)
 {
-	pipex->j = -1;
 	pipex->in_fd = -1;
 	pipex->out_fd = -1;
 	pipex->all_path = NULL;
@@ -92,6 +50,7 @@ void	init_pipex(t_pipex *pipex)
 	pipex->path2 = NULL;
 	pipex->cmd1 = NULL;
 	pipex->cmd2 = NULL;
+	pipex->j = 0;
 }
 
 int	main(int argc, char **argv, char **envp)
@@ -102,7 +61,7 @@ int	main(int argc, char **argv, char **envp)
 
 	pipex = NULL;
 	if (argc != 5)
-		return (error_message("Invalid arguments\n", pipex, 0));
+		error_message("Invalid arguments\n", pipex, 0);
 	pipex = malloc(sizeof(t_pipex));
 	if (!pipex)
 		error_message("Error malloc\n", pipex, 0);
@@ -116,5 +75,9 @@ int	main(int argc, char **argv, char **envp)
 	if (pid < 0)
 		error_message("Error en pid\n", pipex, 0);
 	if (pid == 0)
-		child_process(pipex);
+		child_process(envp, argv[1], pipex, fd);
+	waitpid(pid, NULL, 0);
+	if (pid != 0)
+		parent_process(envp, argv[4], pipex, fd);
+	return (0);
 }

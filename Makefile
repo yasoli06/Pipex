@@ -8,16 +8,16 @@ NAME = pipex
 
 LIBFT = ./libft/libft.a
 
-SRCS = main.c error.c utils.c utils2.c #processes.c
+SRCS = main.c error.c utils.c pipex.c processes.c
 
 OBJECTS = $(SRCS:%.c=%.o)
 
-CC = gcc
+CC = cc -g
 CFLAGS = -Wall -Wextra -Werror
 LIBFT_FLAGS = -L ./libft -lft
 RM = rm -rf
 
-%.o: %.c Makefile
+%.o: %.c Makefile pipex.h
 	$(CC) -c $< $(CFLAGS) -o $@
 	@echo "$(YELLOW)Compiling... $(END)$(patsubst $(DIR_BUILD)%,%,$@)"
 
@@ -25,12 +25,8 @@ all: $(LIBFT) $(NAME)
 
 $(LIBFT):
 	@$(MAKE) -C ./libft -s
-
-# $(BIN):
-# 	@mkdir -p $(BIN)
-
 $(NAME) : $(OBJECTS)
-	@$(CC) $(CFLAGS) $(OBJECTS) $(LIBFT) -o $(NAME) -s
+	@$(CC) $(CFLAGS) $(OBJECTS) $(LIBFT) -o $(NAME)
 	@echo "$(GREEN)PIPEX DONE$(END)"
 
 clean:
